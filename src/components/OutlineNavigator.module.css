@@ -1,0 +1,313 @@
+/* OutlineNavigator.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--color-background-light, #f8f9fa);
+  border-right: 1px solid var(--color-border, #e9ecef);
+}
+
+/* ===== 헤더 ===== */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  border-bottom: 1px solid var(--color-border, #e9ecef);
+  background-color: var(--color-white, #ffffff);
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #212529);
+}
+
+.outlineInfo {
+  display: flex;
+  gap: var(--spacing-sm, 8px);
+  font-size: 12px;
+}
+
+.formatType {
+  background-color: var(--color-primary-light, #e3f2fd);
+  color: var(--color-primary, #007bff);
+  padding: 2px var(--spacing-xs, 4px);
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+.chapterCount {
+  color: var(--color-text-secondary, #6c757d);
+}
+
+/* ===== 메인 컨텐츠 ===== */
+
+.content {
+  flex: 1;
+  padding: var(--spacing-sm, 8px);
+  overflow-y: auto;
+}
+
+.overallTheme {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  background-color: var(--color-white, #ffffff);
+  border-radius: var(--border-radius, 4px);
+  margin-bottom: var(--spacing-md, 16px);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.overallTheme strong {
+  color: var(--color-primary, #007bff);
+}
+
+/* ===== 장 목록 ===== */
+
+.chapterList {
+  space: var(--spacing-xs, 4px);
+}
+
+.chapterItem {
+  margin-bottom: var(--spacing-xs, 4px);
+  background-color: var(--color-white, #ffffff);
+  border-radius: var(--border-radius, 4px);
+  overflow: hidden;
+  border: 1px solid var(--color-border, #e9ecef);
+  transition: var(--transition, all 0.3s ease);
+}
+
+.chapterItem:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== 장 헤더 ===== */
+
+.chapterHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  cursor: pointer;
+  transition: var(--transition, all 0.3s ease);
+}
+
+.chapterHeader:hover {
+  background-color: var(--color-background, #f8f9fa);
+}
+
+.chapterNumber {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary, #007bff);
+  background-color: var(--color-primary-light, #e3f2fd);
+  padding: 2px var(--spacing-xs, 4px);
+  border-radius: 2px;
+  min-width: 45px;
+  text-align: center;
+}
+
+.chapterTitle {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary, #212529);
+  min-width: 0;
+  word-wrap: break-word;
+}
+
+.expandButton {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs, 4px);
+  color: var(--color-text-secondary, #6c757d);
+  font-size: 10px;
+  transition: var(--transition, all 0.3s ease);
+  transform: rotate(-90deg);
+}
+
+.expandButton:hover {
+  color: var(--color-primary, #007bff);
+}
+
+.expandButton.expanded {
+  transform: rotate(0deg);
+}
+
+/* ===== 장 세부 정보 ===== */
+
+.chapterDetails {
+  padding: var(--spacing-md, 16px);
+  border-top: 1px solid var(--color-border, #e9ecef);
+  background-color: var(--color-background, #f8f9fa);
+  font-size: 13px;
+}
+
+.detailItem {
+  margin-bottom: var(--spacing-sm, 8px);
+  line-height: 1.4;
+}
+
+.detailItem:last-child {
+  margin-bottom: 0;
+}
+
+.detailItem strong {
+  color: var(--color-text-primary, #212529);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.eventList {
+  margin: var(--spacing-xs, 4px) 0 0 var(--spacing-md, 16px);
+  padding: 0;
+}
+
+.eventList li {
+  margin-bottom: 2px;
+  color: var(--color-text-secondary, #6c757d);
+}
+
+.eventList li:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== 빠른 액션 ===== */
+
+.quickActions {
+  display: flex;
+  gap: var(--spacing-xs, 4px);
+  margin-top: var(--spacing-md, 16px);
+  padding-top: var(--spacing-md, 16px);
+  border-top: 1px solid var(--color-border, #e9ecef);
+}
+
+.actionButton {
+  flex: 1;
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  background-color: var(--color-white, #ffffff);
+  border: 1px solid var(--color-border, #e9ecef);
+  border-radius: var(--border-radius, 4px);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--color-text-secondary, #6c757d);
+  transition: var(--transition, all 0.3s ease);
+}
+
+.actionButton:hover {
+  background-color: var(--color-primary, #007bff);
+  color: var(--color-white, #ffffff);
+  border-color: var(--color-primary, #007bff);
+}
+
+/* ===== 빈 상태 ===== */
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-secondary, #6c757d);
+  font-size: 14px;
+}
+
+.emptyState p {
+  margin: 0;
+}
+
+/* ===== 스크롤바 커스터마이징 ===== */
+
+.content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: var(--color-background, #f8f9fa);
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: var(--color-border-dark, #ced4da);
+  border-radius: 3px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary, #6c757d);
+}
+
+/* ===== 반응형 디자인 ===== */
+
+@media (max-width: 768px) {
+  .header {
+    padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  }
+  
+  .header h3 {
+    font-size: 14px;
+  }
+  
+  .outlineInfo {
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-end;
+  }
+  
+  .content {
+    padding: var(--spacing-xs, 4px);
+  }
+  
+  .overallTheme {
+    padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    font-size: 13px;
+  }
+  
+  .chapterHeader {
+    padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    gap: var(--spacing-xs, 4px);
+  }
+  
+  .chapterNumber {
+    font-size: 11px;
+    min-width: 40px;
+  }
+  
+  .chapterTitle {
+    font-size: 13px;
+  }
+  
+  .chapterDetails {
+    padding: var(--spacing-sm, 8px);
+    font-size: 12px;
+  }
+  
+  .quickActions {
+    margin-top: var(--spacing-sm, 8px);
+    padding-top: var(--spacing-sm, 8px);
+  }
+}
+
+/* ===== 애니메이션 ===== */
+
+.chapterDetails {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 200px;
+    padding-top: var(--spacing-md, 16px);
+    padding-bottom: var(--spacing-md, 16px);
+  }
+}

@@ -1,0 +1,743 @@
+/* ManuscriptViewer.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  background-color: var(--color-white, #ffffff);
+}
+
+/* ===== 헤더 ===== */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
+  border-bottom: 1px solid var(--color-border, #e9ecef);
+  background-color: var(--color-background-light, #f8f9fa);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary, #212529);
+}
+
+.stats {
+  display: flex;
+  gap: var(--spacing-md, 16px);
+  font-size: 14px;
+  color: var(--color-text-secondary, #6c757d);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md, 16px);
+}
+
+/* ===== 편집 모드 토글 버튼 ===== */
+
+.editModeButton {
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  background-color: var(--color-white, #ffffff);
+  border: 1px solid var(--color-border, #e9ecef);
+  color: var(--color-text-secondary, #6c757d);
+  border-radius: var(--border-radius, 4px);
+  cursor: pointer;
+  font-size: 12px;
+  transition: var(--transition, all 0.3s ease);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+}
+
+.editModeButton:hover {
+  background-color: var(--color-background, #f8f9fa);
+  border-color: var(--color-primary, #007bff);
+}
+
+.editModeButton.active {
+  background-color: var(--color-primary, #007bff);
+  color: var(--color-white, #ffffff);
+  border-color: var(--color-primary, #007bff);
+}
+
+.selectionStat {
+  color: var(--color-primary, #007bff);
+  font-weight: 500;
+}
+
+/* ===== 메인 컨텐츠 ===== */
+
+.content {
+  flex: 1;
+  padding: var(--spacing-lg, 24px);
+  overflow-y: auto;
+  line-height: 1.8;
+  font-size: 16px;
+  color: var(--color-text-primary, #212529);
+  user-select: text;
+  cursor: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+.content.selecting {
+  cursor: crosshair;
+}
+
+.content.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ===== 직접 편집 모드 스타일 ===== */
+
+.editableContent {
+  outline: none;
+  border: 2px dashed var(--color-primary, #007bff);
+  border-radius: var(--border-radius, 4px);
+  background-color: var(--color-background-light, #f8f9fa);
+}
+
+.editableContent:focus-within {
+  border-style: solid;
+  background-color: var(--color-white, #ffffff);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* 직접 편집 모드에서의 장 제목 스타일 */
+.editableContent .chapterTitle {
+  outline: 1px dashed rgba(0, 123, 255, 0.3);
+  outline-offset: 2px;
+  transition: outline 0.2s ease;
+}
+
+.editableContent .chapterTitle:focus {
+  outline: 2px solid var(--color-primary, #007bff);
+  outline-offset: 2px;
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* 직접 편집 모드에서의 문단 스타일 */
+.editableContent .paragraphContent {
+  outline: 1px dashed rgba(0, 123, 255, 0.2);
+  outline-offset: 1px;
+  border-radius: 2px;
+  transition: outline 0.2s ease;
+  min-height: 1.2em; /* 빈 문단도 편집 가능하도록 */
+}
+
+.editableContent .paragraphContent:focus {
+  outline: 2px solid rgba(0, 123, 255, 0.5);
+  outline-offset: 1px;
+  background-color: rgba(0, 123, 255, 0.02);
+}
+
+/* 직접 편집 모드에서의 이미지 스타일 */
+.editableContent .chapterImage {
+  border: 1px dashed rgba(0, 123, 255, 0.3);
+  position: relative;
+}
+
+.editableContent .chapterImage:hover {
+  border-color: rgba(0, 123, 255, 0.6);
+}
+
+/* ===== 장 제목 스타일 ===== */
+
+.chapterTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary, #007bff);
+  margin: var(--spacing-xl, 32px) 0 var(--spacing-lg, 24px) 0;
+  padding-bottom: var(--spacing-md, 16px);
+  border-bottom: 2px solid var(--color-border, #e9ecef);
+  scroll-margin-top: 80px; /* 네비게이션을 위한 여백 */
+  position: relative;
+  transition: margin 0.3s ease;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+.chapterTitle:first-child {
+  margin-top: 0;
+}
+
+.chapterTitle.hovered {
+  margin-top: var(--spacing-xl, 32px);
+  margin-bottom: var(--spacing-xl, 32px);
+}
+
+/* ===== 이미지 추가 기능 ===== */
+
+.imageAddOverlay {
+  position: absolute;
+  top: 50%; 
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  animation: fadeInUp 0.3s ease-in-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -30%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.imageAddButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  background-color: var(--color-primary, #007bff);
+  color: var(--color-white, #ffffff);
+  border: none;
+  border-radius: var(--border-radius, 4px);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  transition: var(--transition, all 0.3s ease);
+}
+
+.imageAddButton:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
+}
+
+/* ===== 이미지 표시 스타일 ===== */
+
+.chapterImage {
+  position: relative;
+  margin: var(--spacing-lg, 24px) 0;
+  text-align: center;
+  background-color: var(--color-background-light, #f8f9fa);
+  border-radius: var(--border-radius, 4px);
+  padding: var(--spacing-md, 16px);
+}
+
+.chapterImage img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--border-radius, 4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: block;
+  margin: 0 auto var(--spacing-sm, 8px);
+}
+
+.imageSizesmall {
+  max-width: 200px;
+}
+
+.imageSizemedium {
+  max-width: 400px;
+}
+
+.imageSizelarge {
+  max-width: 600px;
+}
+
+/* ===== 이미지 컨트롤 영역 ===== */
+
+.imageControls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--spacing-xs, 4px);
+  margin-bottom: var(--spacing-sm, 8px);
+}
+
+.imageSizeInfo {
+  padding: 2px 6px;
+  background-color: var(--color-background-light, #f8f9fa);
+  border: 1px solid var(--color-border, #e9ecef);
+  border-radius: var(--border-radius, 4px);
+  font-size: 12px;
+  color: var(--color-text-secondary, #6c757d);
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.imageDeleteButton {
+  padding: var(--spacing-xs, 4px);
+  background-color: rgba(220, 53, 69, 0.9);
+  border: none;
+  border-radius: 50%;
+  color: var(--color-white, #ffffff);
+  cursor: pointer;
+  font-size: 12px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition, all 0.3s ease);
+  opacity: 0.7;
+}
+
+.imageDeleteButton:hover {
+  background-color: #dc3545;
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ===== 이미지 캡션 입력 ===== */
+
+.imageCaptionInput {
+  width: 100%;
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  border: 1px solid var(--color-border, #e9ecef);
+  border-radius: var(--border-radius, 4px);
+  background-color: var(--color-white, #ffffff);
+  font-size: 14px;
+  color: var(--color-text-secondary, #6c757d);
+  font-style: italic;
+  text-align: center;
+  transition: var(--transition, all 0.3s ease);
+}
+
+.imageCaptionInput:focus {
+  outline: none;
+  border-color: var(--color-primary, #007bff);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  color: var(--color-text-primary, #212529);
+  font-style: normal;
+}
+
+.imageCaptionInput::placeholder {
+  color: var(--color-text-light, #adb5bd);
+  font-style: italic;
+}
+
+/* ===== 리사이즈 가능한 이미지 컨테이너 ===== */
+
+.resizableImageContainer {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.resizableImage {
+  display: block;
+  border-radius: var(--border-radius, 4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.resizableImage:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.resizeHandle {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  background-color: var(--color-primary, #007bff);
+  border: 2px solid var(--color-white, #ffffff);
+  border-radius: 0 0 var(--border-radius, 4px) 0;
+  cursor: nw-resize;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+
+.resizeHandle::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-bottom: 6px solid var(--color-white, #ffffff);
+}
+
+.resizeHandle::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-bottom: 3px solid var(--color-white, #ffffff);
+}
+
+.resizableImageContainer:hover .resizeHandle {
+  opacity: 1;
+}
+
+.resizeHandle:hover {
+  background-color: #0056b3;
+  transform: scale(1.1);
+}
+
+/* 리사이즈 중 스타일 */
+.resizableImage[data-resizing="true"] {
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
+  outline: 2px solid var(--color-primary, #007bff);
+  outline-offset: 2px;
+}
+
+/* 기존 imageCaption 스타일 (읽기 전용용으로 유지) */
+.imageCaption {
+  margin-top: var(--spacing-sm, 8px);
+  font-size: 14px;
+  color: var(--color-text-secondary, #6c757d);
+  font-style: italic;
+}
+
+/* ===== 문단 스타일 ===== */
+
+.paragraph {
+  margin-bottom: var(--spacing-lg, 24px);
+}
+
+.paragraphContent {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  text-align: justify;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+.paragraphContent:empty {
+  display: none;
+}
+
+/* ===== 하이라이트 스타일 ===== */
+
+.highlightEdit {
+  background-color: rgba(255, 235, 59, 0.3);
+  border-radius: 2px;
+  padding: 1px 2px;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.highlightEdit:hover {
+  background-color: rgba(255, 235, 59, 0.5);
+}
+
+.highlightQuestion {
+  background-color: rgba(33, 150, 243, 0.2);
+  border-radius: 2px;
+  padding: 1px 2px;
+}
+
+.highlightNew {
+  background-color: rgba(76, 175, 80, 0.3);
+  border-radius: 2px;
+  padding: 1px 2px;
+  animation: highlightFadeIn 0.5s ease-in-out;
+}
+
+@keyframes highlightFadeIn {
+  from {
+    background-color: rgba(76, 175, 80, 0.8);
+  }
+  to {
+    background-color: rgba(76, 175, 80, 0.3);
+  }
+}
+
+/* ===== 텍스트 선택 관련 ===== */
+
+/* 직접편집 모드에서는 항상 드래그 하이라이트 표시 */
+.editableContent ::selection {
+  background-color: rgba(0, 123, 255, 0.3);
+  color: inherit;
+}
+
+.editableContent ::-moz-selection {
+  background-color: rgba(0, 123, 255, 0.3);
+  color: inherit;
+}
+
+/* 읽기 모드에서는 드래그 중에만 하이라이트 표시 */
+.content:not(.editableContent).selecting ::selection {
+  background-color: rgba(0, 123, 255, 0.3);
+  color: inherit;
+}
+
+.content:not(.editableContent).selecting ::-moz-selection {
+  background-color: rgba(0, 123, 255, 0.3);
+  color: inherit;
+}
+
+/* 읽기 모드에서 선택 완료 후에는 브라우저 기본 하이라이트 비활성화 */
+.content:not(.editableContent):not(.selecting) ::selection {
+  background-color: transparent;
+  color: inherit;
+}
+
+.content:not(.editableContent):not(.selecting) ::-moz-selection {
+  background-color: transparent;
+  color: inherit;
+}
+
+/* ===== 선택 정보 패널 ===== */
+
+.selectionInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-md, 16px);
+  padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
+  background-color: var(--color-primary-light, #e3f2fd);
+  border-top: 1px solid var(--color-primary, #007bff);
+  border-bottom: 1px solid var(--color-border, #e9ecef);
+}
+
+.selectionPreview {
+  flex: 1;
+  min-width: 0;
+}
+
+.selectionPreview strong {
+  display: block;
+  font-size: 14px;
+  color: var(--color-primary, #007bff);
+  margin-bottom: var(--spacing-xs, 4px);
+}
+
+.selectionPreview p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-text-primary, #212529);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.clearSelection {
+  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+  background-color: var(--color-white, #ffffff);
+  border: 1px solid var(--color-primary, #007bff);
+  color: var(--color-primary, #007bff);
+  border-radius: var(--border-radius, 4px);
+  cursor: pointer;
+  font-size: 12px;
+  transition: var(--transition, all 0.3s ease);
+  flex-shrink: 0;
+}
+
+.clearSelection:hover {
+  background-color: var(--color-primary, #007bff);
+  color: var(--color-white, #ffffff);
+}
+
+/* ===== 빈 상태 ===== */
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-secondary, #6c757d);
+  font-size: 16px;
+}
+
+.emptyState p {
+  margin: 0;
+}
+
+/* ===== AI 처리 중 오버레이 ===== */
+
+.processingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.processingMessage {
+  text-align: center;
+  padding: var(--spacing-lg, 24px);
+  background-color: var(--color-white, #ffffff);
+  border-radius: var(--border-radius, 4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border, #e9ecef);
+  border-top: 3px solid var(--color-primary, #007bff);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto var(--spacing-md, 16px);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.processingMessage p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary, #6c757d);
+}
+
+/* ===== 스크롤바 커스터마이징 ===== */
+
+.content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: var(--color-background, #f8f9fa);
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: var(--color-border-dark, #ced4da);
+  border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary, #6c757d);
+}
+
+/* ===== 반응형 디자인 ===== */
+
+@media (max-width: 768px) {
+  .header {
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  }
+  
+  .header h2 {
+    font-size: 16px;
+  }
+  
+  .stats {
+    gap: var(--spacing-sm, 8px);
+    font-size: 12px;
+  }
+  
+  .content {
+    padding: var(--spacing-md, 16px);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  
+  .chapterTitle {
+    font-size: 20px;
+    margin: var(--spacing-lg, 24px) 0 var(--spacing-md, 16px) 0;
+  }
+  
+  .selectionInfo {
+    flex-direction: column;
+    gap: var(--spacing-sm, 8px);
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  }
+  
+  .clearSelection {
+    align-self: flex-end;
+  }
+}
+
+/* ===== 인쇄 스타일 ===== */
+
+@media print {
+  .header,
+  .selectionInfo,
+  .processingOverlay {
+    display: none;
+  }
+  
+  .content {
+    padding: 0;
+    overflow: visible;
+  }
+  
+  .chapterTitle {
+    page-break-before: always;
+  }
+  
+  .paragraph {
+    page-break-inside: avoid;
+  }
+}
+
+/* ===== 새로운 장별 구조 스타일 ===== */
+
+.chapterSection {
+  margin-bottom: var(--spacing-xl, 32px);
+}
+
+.chapterContent {
+  line-height: 1.8;
+  color: var(--color-text-primary, #212529);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  min-height: 40px;
+  padding: var(--spacing-md, 16px);
+  border-radius: var(--border-radius, 4px);
+  margin-top: var(--spacing-md, 16px);
+  font-size: 16px;
+  border: 1px solid transparent;
+  transition: var(--transition, all 0.3s ease);
+}
+
+.chapterContent:focus {
+  outline: 2px solid var(--color-primary, #007bff);
+  outline-offset: -2px;
+  background-color: var(--color-background-light, #f8f9fa);
+  border-color: var(--color-primary-light, #cce7ff);
+}
+
+.chapterContent:hover {
+  border-color: var(--color-border-hover, #adb5bd);
+}
+
+/* 직접 편집 모드에서 장 내용 스타일 */
+.editableContent .chapterContent {
+  background-color: var(--color-white, #ffffff);
+  border: 1px solid var(--color-border, #e9ecef);
+}
+
+.editableContent .chapterContent:focus {
+  background-color: var(--color-background-light, #f8f9fa);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* 읽기 모드에서 장 내용 스타일 */
+.content:not(.editableContent) .chapterContent {
+  padding: var(--spacing-sm, 8px);
+  border: none;
+  margin-top: var(--spacing-sm, 8px);
+}
+
+/* 장 내용에서 단락 스타일링 */
+.chapterContent p {
+  margin-bottom: var(--spacing-md, 16px);
+}
+
+.chapterContent p:last-child {
+  margin-bottom: 0;
+}

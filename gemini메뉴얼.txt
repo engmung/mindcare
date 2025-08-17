@@ -1,0 +1,749 @@
+# Gemini API 사용 메뉴얼 - 자서전 생성 시스템
+
+## 목차
+1. [기본 설정](#기본-설정)
+2. [Structured Output 사용법](#structured-output-사용법)
+3. [Function Calling 사용법](#function-calling-사용법)
+4. [자서전 시스템 에이전트 구현](#자서전-시스템-에이전트-구현)
+5. [에러 핸들링](#에러-핸들링)
+6. [베스트 프랙티스](#베스트-프랙티스)
+
+## 기본 설정
+
+### 설치
+```bash
+npm install @google/genai mime
+npm install -D @types/node
+```
+
+### 환경 변수 설정
+```javascript
+// .env 파일
+GEMINI_API_KEY=your_api_key_here
+```
+
+### 기본 클라이언트 설정
+```javascript
+import { GoogleGenAI } from '@google/genai';
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
+```
+
+## Structured Output 사용법
+
+### 기본 구조
+Structured Output을 사용하면 AI가 항상 지정된 JSON 스키마에 맞는 응답을 생성합니다.
+
+```javascript
+const config = {
+  responseMimeType: 'application/json',
+  systemInstruction: [
+    {
+      text: `시스템 프롬프트 내용`,
+    }
+  ],
+  // responseSchema: schema 객체 (선택적)
+};
+
+const response = await ai.models.generateContent({
+  model: 'gemini-2.5-flash',
+  config,
+  contents: [
+    {
+      role: 'user',
+      parts: [{ text: 'INPUT_HERE' }],
+    },
+  ],
+});
+```
+
+### 자서전 시스템 Structured Output 예시
+
+#### 1. 질문 생성 에이전트 스키마
+```javascript
+const questionSchema = {
+  type: "object",
+  properties: {
+    question: {
+      type: "string",
+      description: "생성된 질문 내용"
+    },
+    context: {
+      type: "string", 
+      description: "질문의 배경 및 맥락"
+    },
+    expected_info_type: {
+      type: "string",
+      enum: ["factual", "emotional", "reflective", "descriptive"],
+      description: "기대하는 답변의 성격"
+    },
+    follow_up_hints: {
+      type: "array",
+      items: {
+        type: "string"
+      },
+      description: "후속 질문 힌트들"
+    }
+  },
+  required: ["question", "context", "expected_info_type"]
+};
+
+const questionConfig = {
+  responseMimeType: 'application/json',
+  responseSchema: questionSchema,
+  systemInstruction: [
+    {
+      text: `당신은 자서전 작성을 위한 질문 생성 전문가입니다. 
+             사용자의 인생 이야기를 깊이 있게 끌어낼 수 있는 
+             개인적이고 의미 있는 질문을 생성하세요.`,
+    }
+  ],
+};
+
+// 사용 예시
+const questionResponse = await ai.models.generateContent({
+  model: 'gemini-2.5-flash',
+  config: questionConfig,
+  contents: [
+    {
+      role: 'user',
+      parts: [
+        { 
+          text: `형식: 에세이
+                 대상 영역: 가족 관계
+                 부족한 부분: 어린 시절 부모와의 감정적 관계
+                 기존 정보: 부모님은 맞벌이, 할머니가 돌봄` 
+        }
+      ],
+    },
+  ],
+});
+
+const questionData = JSON.parse(questionResponse.text);
+console.log(questionData.question);
+```
+
+#### 2. 정리 에이전트 스키마
+```javascript
+const mindmapSchema = {
+  type: "object",
+  properties: {
+    keywords: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          content: { type: "string" },
+          category: { 
+            type: "string",
+            enum: ["family", "work", "education", "growth", "relationship", "travel", "hobby"]
+          },
+          importance: {
+            type: "number",
+            description: "1-10 중요도"
+          }
+        },
+        required: ["id", "content", "category"]
+      }
+    },
+    emotions: {
+      type: "array",
+      items: { type: "string" }
+    },
+    people: {
+      type: "array", 
+      items: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          relationship: { type: "string" },
+          importance: { type: "string", enum: ["high", "medium", "low"] }
+        }
+      }
+    },
+    connections: {
+      type: "array",
+      items: {
+        type: "object", 
+        properties: {
+          from_keyword: { type: "string" },
+          to_keyword: { type: "string" },
+          connection_type: { 
+            type: "string",
+            enum: ["causal", "temporal", "emotional", "topical"]
+          }
+        }
+      }
+    },
+    timeframe: {
+      type: "object",
+      properties: {
+        period: { type: "string" },
+        specific_date: { type: "string" },
+        life_stage: { 
+          type: "string",
+          enum: ["childhood", "adolescence", "young_adult", "adult", "middle_age", "senior"]
+        }
+      }
+    }
+  },
+  required: ["keywords", "emotions", "people", "connections"]
+};
+
+const organizationConfig = {
+  responseMimeType: 'application/json',
+  responseSchema: mindmapSchema,
+  systemInstruction: [
+    {
+      text: `당신은 개인 이야기를 구조화하는 전문가입니다. 
+             사용자의 답변에서 핵심 키워드를 추출하고,
+             감정, 인물, 시간 정보를 정리하며,
+             요소들 간의 연결관계를 파악하여 마인드맵을 생성하세요.`,
+    }
+  ],
+};
+```
+
+#### 3. 목차 생성 에이전트 스키마
+```javascript
+const outlineSchema = {
+  type: "object",
+  properties: {
+    format_type: {
+      type: "string",
+      enum: ["chronological", "essay", "memoir", "interview"]
+    },
+    overall_theme: {
+      type: "string",
+      description: "자서전의 전체 주제나 메시지"
+    },
+    chapters: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          chapter_number: { type: "number" },
+          title: { type: "string" },
+          description: { type: "string" },
+          main_keywords: {
+            type: "array",
+            items: { type: "string" }
+          },
+          estimated_length: {
+            type: "string",
+            enum: ["short", "medium", "long"]
+          },
+          emotional_tone: {
+            type: "string",
+            enum: ["happy", "nostalgic", "bittersweet", "triumphant", "reflective", "humorous"]
+          }
+        },
+        required: ["chapter_number", "title", "description", "main_keywords"]
+      }
+    },
+    writing_style_notes: {
+      type: "array",
+      items: { type: "string" },
+      description: "각 챕터별 글쓰기 스타일 제안"
+    }
+  },
+  required: ["format_type", "overall_theme", "chapters"]
+};
+```
+
+## Function Calling 사용법
+
+### 기본 구조
+Function Calling을 사용하면 AI가 적절한 함수를 선택하고 파라미터를 제공합니다.
+
+```javascript
+// 함수 선언 정의
+const functionDeclarations = [
+  {
+    name: 'function_name',
+    description: '함수 설명',
+    parameters: {
+      type: 'object',
+      properties: {
+        param1: {
+          type: 'string',
+          description: '파라미터 설명'
+        }
+      },
+      required: ['param1']
+    }
+  }
+];
+
+// 설정
+const config = {
+  tools: [{
+    functionDeclarations: functionDeclarations
+  }],
+  systemInstruction: [
+    {
+      text: '시스템 프롬프트'
+    }
+  ]
+};
+
+// 요청
+const response = await ai.models.generateContent({
+  model: 'gemini-2.5-flash',
+  config,
+  contents: [
+    {
+      role: 'user',
+      parts: [{ text: 'INPUT_HERE' }]
+    }
+  ]
+});
+
+// Function Call 처리
+if (response.functionCalls && response.functionCalls.length > 0) {
+  const functionCall = response.functionCalls[0];
+  // 함수 실행 로직
+}
+```
+
+### 자서전 시스템 Function Calling 예시
+
+#### 총괄 에이전트 Function Declarations
+```javascript
+const masterAgentFunctions = [
+  {
+    name: 'call_question_agent',
+    description: '질문 생성 에이전트를 호출하여 새로운 질문을 생성합니다',
+    parameters: {
+      type: 'object',
+      properties: {
+        target_area: {
+          type: 'string',
+          enum: ['family', 'work', 'education', 'growth', 'relationship', 'travel', 'hobby'],
+          description: '질문이 필요한 영역'
+        },
+        format_type: {
+          type: 'string', 
+          enum: ['chronological', 'essay', 'memoir', 'interview'],
+          description: '사용자가 선택한 자서전 형식'
+        },
+        deficiency_focus: {
+          type: 'string',
+          description: '부족한 구체적 정보 유형 (예: 감정적 깊이, 구체적 사건, 배경 정보)'
+        },
+        related_keywords: {
+          type: 'array',
+          items: { type: 'string' },
+          description: '관련된 기존 키워드들'
+        }
+      },
+      required: ['target_area', 'format_type', 'deficiency_focus']
+    }
+  },
+  {
+    name: 'call_outline_agent', 
+    description: '목차 생성 에이전트를 호출하여 자서전 구조를 생성합니다',
+    parameters: {
+      type: 'object',
+      properties: {
+        format_type: {
+          type: 'string',
+          enum: ['chronological', 'essay', 'memoir', 'interview'],
+          description: '사용자가 선택한 자서전 형식'
+        },
+        collected_themes: {
+          type: 'array',
+          items: { type: 'string' },
+          description: '수집된 주요 테마들'
+        },
+        balance_requirements: {
+          type: 'object',
+          properties: {
+            focus_areas: {
+              type: 'array', 
+              items: { type: 'string' }
+            },
+            tone_preference: { type: 'string' }
+          }
+        }
+      },
+      required: ['format_type', 'collected_themes']
+    }
+  },
+  {
+    name: 'call_organization_agent',
+    description: '정리 에이전트를 호출하여 새로운 답변을 마인드맵에 통합합니다',
+    parameters: {
+      type: 'object',
+      properties: {
+        new_answer: {
+          type: 'string',
+          description: '사용자의 최신 답변'
+        },
+        question_context: {
+          type: 'string',
+          description: '질문의 맥락 정보'
+        },
+        update_mode: {
+          type: 'string',
+          enum: ['incremental', 'full_refresh'],
+          description: '업데이트 방식'
+        }
+      },
+      required: ['new_answer', 'question_context']
+    }
+  },
+  {
+    name: 'advance_phase',
+    description: '다음 단계로 진행합니다',
+    parameters: {
+      type: 'object',
+      properties: {
+        current_phase: {
+          type: 'number',
+          description: '현재 단계 번호 (1-6)'
+        },
+        completion_reason: {
+          type: 'string',
+          description: '단계 완료 사유'
+        }
+      },
+      required: ['current_phase', 'completion_reason']
+    }
+  }
+];
+
+const masterConfig = {
+  tools: [{
+    functionDeclarations: masterAgentFunctions
+  }],
+  systemInstruction: [
+    {
+      text: `당신은 자서전 생성 프로세스를 총괄하는 마스터 에이전트입니다.
+             현재 수집된 정보를 분석하고, 다음에 필요한 액션을 결정하세요.
+             정보가 부족하면 질문 에이전트를 호출하고,
+             충분하면 단계를 진행하거나 목차 생성을 요청하세요.`
+    }
+  ]
+};
+```
+
+## 자서전 시스템 에이전트 구현
+
+### 1. 총괄 에이전트 (Master Agent)
+```javascript
+class MasterAgent {
+  constructor(ai) {
+    this.ai = ai;
+    this.config = masterConfig;
+  }
+
+  async analyze(currentData) {
+    const prompt = `
+현재 상황:
+- 단계: ${currentData.phase}
+- 수집된 답변 수: ${currentData.answers.length}
+- 마인드맵 요소: ${JSON.stringify(currentData.mindmap)}
+
+다음 액션을 결정하세요:
+1. 추가 질문이 필요한가?
+2. 단계를 진행할 준비가 되었는가?
+3. 어떤 영역이 부족한가?
+    `;
+
+    const response = await this.ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      config: this.config,
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: prompt }]
+        }
+      ]
+    });
+
+    return this.processFunctionCalls(response.functionCalls);
+  }
+
+  async processFunctionCalls(functionCalls) {
+    const results = [];
+    
+    for (const call of functionCalls) {
+      switch (call.name) {
+        case 'call_question_agent':
+          const question = await this.callQuestionAgent(call.args);
+          results.push({ type: 'question', data: question });
+          break;
+          
+        case 'call_outline_agent':
+          const outline = await this.callOutlineAgent(call.args);
+          results.push({ type: 'outline', data: outline });
+          break;
+          
+        case 'call_organization_agent':
+          const mindmap = await this.callOrganizationAgent(call.args);
+          results.push({ type: 'mindmap', data: mindmap });
+          break;
+          
+        case 'advance_phase':
+          results.push({ type: 'advance', data: call.args });
+          break;
+      }
+    }
+    
+    return results;
+  }
+
+  async callQuestionAgent(args) {
+    const questionAgent = new QuestionAgent(this.ai);
+    return await questionAgent.generateQuestion(args);
+  }
+
+  async callOutlineAgent(args) {
+    const outlineAgent = new OutlineAgent(this.ai);
+    return await outlineAgent.generateOutline(args);
+  }
+
+  async callOrganizationAgent(args) {
+    const orgAgent = new OrganizationAgent(this.ai);
+    return await orgAgent.organizeData(args);
+  }
+}
+```
+
+### 2. 질문 생성 에이전트 (Question Agent)
+```javascript
+class QuestionAgent {
+  constructor(ai) {
+    this.ai = ai;
+    this.config = questionConfig; // 앞서 정의한 questionConfig
+  }
+
+  async generateQuestion(args) {
+    const { target_area, format_type, deficiency_focus, related_keywords } = args;
+    
+    const prompt = `
+대상 영역: ${target_area}
+형식: ${format_type}
+부족한 부분: ${deficiency_focus}
+관련 키워드: ${related_keywords?.join(', ') || '없음'}
+
+위 정보를 바탕으로 적절한 질문을 생성하세요.
+    `;
+
+    const response = await this.ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      config: this.config,
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: prompt }]
+        }
+      ]
+    });
+
+    return JSON.parse(response.text);
+  }
+}
+```
+
+### 3. 정리 에이전트 (Organization Agent)  
+```javascript
+class OrganizationAgent {
+  constructor(ai) {
+    this.ai = ai;
+    this.config = organizationConfig; // 앞서 정의한 organizationConfig
+  }
+
+  async organizeData(args) {
+    const { new_answer, question_context, update_mode } = args;
+    
+    const prompt = `
+새로운 답변: "${new_answer}"
+질문 맥락: "${question_context}"
+업데이트 모드: ${update_mode}
+
+이 답변을 분석하여 키워드를 추출하고 마인드맵을 업데이트하세요.
+    `;
+
+    const response = await this.ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      config: this.config,
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: prompt }]
+        }
+      ]
+    });
+
+    return JSON.parse(response.text);
+  }
+}
+```
+
+### 4. 목차 생성 에이전트 (Outline Agent)
+```javascript
+class OutlineAgent {
+  constructor(ai) {
+    this.ai = ai;
+    this.config = {
+      responseMimeType: 'application/json',
+      responseSchema: outlineSchema, // 앞서 정의한 outlineSchema
+      systemInstruction: [
+        {
+          text: `당신은 자서전 구조 설계 전문가입니다. 
+                 수집된 정보를 바탕으로 논리적이고 감동적인 
+                 자서전 목차를 생성하세요.`
+        }
+      ]
+    };
+  }
+
+  async generateOutline(args) {
+    const { format_type, collected_themes, balance_requirements } = args;
+    
+    const prompt = `
+형식: ${format_type}
+수집된 테마: ${collected_themes.join(', ')}
+균형 요구사항: ${JSON.stringify(balance_requirements)}
+
+위 정보를 바탕으로 ${format_type} 형식에 맞는 목차를 생성하세요.
+    `;
+
+    const response = await this.ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      config: this.config,
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: prompt }]
+        }
+      ]
+    });
+
+    return JSON.parse(response.text);
+  }
+}
+```
+
+## 에러 핸들링
+
+### 기본 에러 핸들링
+```javascript
+async function callGeminiWithRetry(apiCall, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await apiCall();
+      return response;
+    } catch (error) {
+      console.error(`Attempt ${i + 1} failed:`, error);
+      
+      if (i === maxRetries - 1) {
+        throw error;
+      }
+      
+      // 지수적 백오프
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+    }
+  }
+}
+
+// 사용 예시
+const response = await callGeminiWithRetry(async () => {
+  return await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    config: questionConfig,
+    contents: contents
+  });
+});
+```
+
+### JSON 파싱 에러 처리
+```javascript
+function safeJsonParse(text, fallback = {}) {
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    console.error('JSON 파싱 실패:', error);
+    console.log('원본 텍스트:', text);
+    return fallback;
+  }
+}
+
+// 사용 예시
+const response = await ai.models.generateContent(config);
+const data = safeJsonParse(response.text, {
+  keywords: [],
+  emotions: [],
+  people: [],
+  connections: []
+});
+```
+
+### Function Call 검증
+```javascript
+function validateFunctionCall(functionCall, expectedFunctions) {
+  if (!functionCall || !functionCall.name) {
+    throw new Error('유효하지 않은 함수 호출');
+  }
+  
+  if (!expectedFunctions.includes(functionCall.name)) {
+    throw new Error(`예상하지 못한 함수: ${functionCall.name}`);
+  }
+  
+  // 파라미터 검증 로직 추가
+  return true;
+}
+```
+
+## 베스트 프랙티스
+
+### 1. 프롬프트 설계
+- **명확한 역할 정의**: 각 에이전트의 역할을 명확히 설명
+- **구체적인 예시 제공**: 원하는 출력 형태의 예시 포함
+- **제약 조건 명시**: 하지 말아야 할 것들을 명확히 지정
+
+### 2. 스키마 설계
+- **enum 활용**: 가능한 값이 제한적일 때 enum 사용
+- **required 필드**: 필수 필드는 반드시 지정
+- **설명 충실**: 각 필드의 목적과 형태를 명확히 설명
+
+### 3. 성능 최적화
+- **낮은 temperature**: Function Calling 시 temperature=0 사용
+- **적절한 모델 선택**: 작업에 맞는 모델 선택 (gemini-2.5-flash vs gemini-2.0-flash)
+- **토큰 효율성**: 불필요한 정보는 제거하고 핵심만 전달
+
+### 4. 보안 고려사항
+- **API 키 보호**: 환경변수나 안전한 저장소 사용
+- **입력 검증**: 사용자 입력에 대한 적절한 검증
+- **민감 정보 필터링**: 개인정보나 민감한 내용 처리 주의
+
+### 5. 모니터링 및 로깅
+```javascript
+class ApiLogger {
+  static logRequest(model, prompt, config) {
+    console.log(`[API Request] Model: ${model}`);
+    console.log(`[API Request] Prompt length: ${prompt.length}`);
+    console.log(`[API Request] Config:`, JSON.stringify(config, null, 2));
+  }
+  
+  static logResponse(response, processingTime) {
+    console.log(`[API Response] Processing time: ${processingTime}ms`);
+    console.log(`[API Response] Response length: ${response.text?.length || 0}`);
+    if (response.functionCalls) {
+      console.log(`[API Response] Function calls: ${response.functionCalls.length}`);
+    }
+  }
+  
+  static logError(error, context) {
+    console.error(`[API Error] Context: ${context}`);
+    console.error(`[API Error] Error:`, error);
+  }
+}
+```
+
+이 메뉴얼을 참고하여 자서전 생성 시스템의 각 에이전트를 구현하시면 됩니다!

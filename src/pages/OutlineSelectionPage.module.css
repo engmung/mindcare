@@ -1,0 +1,497 @@
+/**
+ * OutlineSelectionPage 스타일
+ */
+
+.outlineSelectionPage {
+  min-height: 100vh;
+  background-color: var(--color-background-light);
+  padding: var(--spacing-xl) 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-xxl);
+}
+
+.header h1 {
+  font-size: var(--font-size-xxxl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.header p {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+}
+
+/* 액션 바 */
+.actionBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-sm);
+}
+
+.backButton,
+.refreshButton,
+.revertButton,
+.confirmButton {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.backButton {
+  background-color: var(--color-light, #f8f9fa);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border, #e9ecef);
+}
+
+.backButton:hover:not(:disabled) {
+  background-color: var(--color-background, #ffffff);
+  border-color: var(--color-primary, #007bff);
+}
+
+.refreshButton {
+  background-color: var(--color-secondary);
+  color: white;
+}
+
+.refreshButton:hover:not(:disabled) {
+  background-color: var(--color-secondary-hover);
+}
+
+.revertButton {
+  background-color: var(--color-warning);
+  color: var(--color-text-primary);
+}
+
+.revertButton:hover {
+  opacity: 0.8;
+}
+
+.confirmButton {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.confirmButton:hover {
+  opacity: 0.9;
+}
+
+/* 캐러셀 컨테이너 */
+.carouselContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--spacing-xxl);
+}
+
+.carouselHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+  max-width: 500px;
+}
+
+.carouselButton {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--box-shadow-sm);
+}
+
+.carouselButton:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: scale(1.05);
+}
+
+.carouselButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.carouselIndicators {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.indicator {
+  background-color: var(--color-border);
+  color: var(--color-text-secondary);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.indicator:hover {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.indicatorActive {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.currentOutlineContainer {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  justify-content: center;
+}
+
+.navigationHint {
+  margin-top: var(--spacing-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.desktopHint {
+  display: inline;
+}
+
+.mobileHint {
+  display: none;
+}
+
+/* 목차 카드 */
+.outlineCard {
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-lg);
+  padding: var(--spacing-xxl);
+  transition: var(--transition);
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.outlineCard:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.outlineHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.outlineHeader h3 {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.formatBadge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.outlineTheme {
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+}
+
+.outlineTheme strong {
+  color: var(--color-text-primary);
+}
+
+/* 챕터 리스트 */
+.chapterList {
+  margin-bottom: var(--spacing-xl);
+}
+
+.chapterList h4 {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.chapterItem {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.chapterItem:last-child {
+  border-bottom: none;
+}
+
+.chapterNumber {
+  flex-shrink: 0;
+  width: 60px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.chapterContent {
+  flex: 1;
+}
+
+.chapterTitle {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.chapterTheme {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.keyEvents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.eventTag {
+  padding: 2px var(--spacing-sm);
+  background-color: var(--color-background-light);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.moreEvents {
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+  font-style: italic;
+}
+
+.chapterMeta {
+  display: flex;
+  gap: var(--spacing-md);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.emotionalTone::before {
+  content: "감정: ";
+}
+
+.estimatedLength::before {
+  content: "분량: ";
+}
+
+/* 선택 버튼 */
+.selectButton {
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.selectButton:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* 수정 섹션 */
+.modificationSection {
+  background-color: var(--color-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: var(--spacing-xl);
+}
+
+.modificationSection h3 {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.modificationSection p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.modificationInput {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  resize: vertical;
+  transition: var(--transition);
+}
+
+.modificationInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.modifyButton {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modifyButton:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.modifyButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 로딩 상태 */
+.loadingContainer {
+  text-align: center;
+  padding: var(--spacing-xxl);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto var(--spacing-lg);
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingContainer p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+}
+
+/* 에러 메시지 */
+.errorMessage {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--color-danger);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+  
+  .header h1 {
+    font-size: var(--font-size-xxl);
+  }
+  
+  .actionBar {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .actionBar button {
+    width: 100%;
+  }
+  
+  /* 캐러셀 모바일 최적화 */
+  .carouselHeader {
+    gap: var(--spacing-md);
+    max-width: 400px;
+  }
+  
+  .carouselButton {
+    width: 40px;
+    height: 40px;
+    font-size: var(--font-size-base);
+  }
+  
+  .indicator {
+    width: 28px;
+    height: 28px;
+    font-size: var(--font-size-xs);
+  }
+  
+  .currentOutlineContainer {
+    max-width: 100%;
+  }
+  
+  .outlineCard {
+    padding: var(--spacing-lg);
+    margin: 0 var(--spacing-sm);
+  }
+  
+  .navigationHint {
+    font-size: var(--font-size-xs);
+    margin-top: var(--spacing-sm);
+  }
+  
+  .desktopHint {
+    display: none;
+  }
+  
+  .mobileHint {
+    display: inline;
+  }
+}

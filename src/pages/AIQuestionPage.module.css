@@ -1,0 +1,837 @@
+/* 채팅 컨테이너 */
+.chatContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--color-background-light);
+  overflow: hidden;
+}
+
+/* 채팅 헤더 */
+.chatHeader {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-bottom: 1px solid var(--color-border-light);
+  box-shadow: var(--box-shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  margin-right: var(--spacing-md);
+  border-radius: var(--border-radius);
+  transition: var(--transition-fast);
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.backButton:hover {
+  background-color: var(--color-background-light);
+}
+
+.headerContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.chatHeader h2 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.conversationCount {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.completeButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-success);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: var(--transition);
+  min-height: var(--touch-target-min);
+}
+
+.completeButton:hover {
+  background-color: var(--color-success-hover);
+  transform: scale(1.05);
+}
+
+/* 메시지 영역 */
+.messagesArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* 메시지 스타일 */
+.message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  animation: fadeIn 0.3s ease;
+}
+
+.message.user {
+  flex-direction: row-reverse;
+}
+
+.message.bot {
+  flex-direction: row;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.message.user .avatar {
+  background-color: var(--color-primary-light);
+}
+
+.message.bot .avatar {
+  background-color: var(--color-background);
+  box-shadow: var(--box-shadow-sm);
+}
+
+.messageContent {
+  max-width: 75%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  word-wrap: break-word;
+}
+
+.message.user .messageContent {
+  background-color: var(--color-primary);
+  color: white;
+  border-bottom-right-radius: var(--spacing-xs);
+}
+
+.message.bot .messageContent {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  border-bottom-left-radius: var(--spacing-xs);
+  box-shadow: var(--box-shadow-sm);
+}
+
+/* 타이핑 인디케이터 */
+.typingIndicator {
+  display: flex;
+  gap: 4px;
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-sm);
+}
+
+.typingIndicator span {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-text-secondary);
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.typingIndicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typingIndicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* 음성 녹음기 컨테이너 */
+.audioRecorderContainer {
+  position: absolute;
+  bottom: calc(var(--spacing-md) * 2 + var(--button-height-mobile));
+  left: var(--spacing-md);
+  right: var(--spacing-md);
+  background-color: var(--color-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-xl);
+  z-index: 20;
+}
+
+.closeRecorder {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: none;
+  border: none;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+}
+
+/* 입력 영역 */
+.inputArea {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-top: 1px solid var(--color-border-light);
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+  align-items: flex-end;
+}
+
+.micButton {
+  padding: var(--spacing-sm);
+  background-color: var(--color-background-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.micButton:hover {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.messageInput {
+  flex: 1;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  outline: none;
+  transition: var(--transition-fast);
+  min-height: var(--input-height-mobile);
+  max-height: 120px;
+  resize: none;
+  line-height: var(--line-height-normal);
+}
+
+.messageInput:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.messageInput:disabled {
+  background-color: var(--color-background-light);
+  cursor: not-allowed;
+}
+
+.sendButton {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: var(--transition);
+  min-width: var(--touch-target-min);
+  min-height: var(--button-height-mobile);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sendButton:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: scale(1.05);
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .chatHeader {
+    padding: var(--spacing-mobile-md);
+  }
+  
+  .backButton {
+    padding: var(--spacing-mobile-sm);
+    margin-right: var(--spacing-mobile-md);
+  }
+  
+  .chatHeader h2 {
+    font-size: var(--font-size-mobile-lg);
+  }
+  
+  .conversationCount {
+    font-size: var(--font-size-mobile-sm);
+  }
+  
+  .completeButton {
+    padding: var(--spacing-mobile-sm) var(--spacing-mobile-md);
+    font-size: var(--font-size-mobile-sm);
+  }
+  
+  .messagesArea {
+    padding: var(--spacing-mobile-md);
+    gap: var(--spacing-mobile-md);
+  }
+  
+  .avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+  
+  .messageContent {
+    max-width: 85%;
+    padding: var(--spacing-mobile-md) var(--spacing-mobile-lg);
+    font-size: var(--font-size-mobile-base);
+  }
+  
+  .inputArea {
+    padding: var(--spacing-mobile-md);
+    gap: var(--spacing-mobile-sm);
+  }
+  
+  .micButton {
+    padding: var(--spacing-mobile-sm);
+    font-size: var(--font-size-mobile-lg);
+  }
+  
+  .messageInput {
+    padding: var(--spacing-mobile-md);
+    font-size: var(--font-size-mobile-base);
+  }
+  
+  .sendButton {
+    padding: var(--spacing-mobile-md);
+    font-size: var(--font-size-mobile-base);
+  }
+  
+  
+  .audioRecorderContainer {
+    bottom: calc(var(--spacing-mobile-md) * 2 + var(--button-height-mobile));
+    left: var(--spacing-mobile-md);
+    right: var(--spacing-mobile-md);
+    padding: var(--spacing-mobile-lg);
+  }
+}
+
+/* 태블릿 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .chatContainer {
+    max-width: 768px;
+    margin: 0 auto;
+  }
+  
+  .messageContent {
+    max-width: 60%;
+  }
+}
+
+/* 데스크탑 */
+@media (min-width: 1025px) {
+  .chatContainer {
+    max-width: 768px;
+    margin: 0 auto;
+    height: calc(100vh - 60px);
+    margin-top: 30px;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--box-shadow-xl);
+  }
+  
+  .messageContent {
+    max-width: 50%;
+  }
+}
+
+/* 메모 관련 스타일 */
+.memoBadge {
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.memoSection {
+  margin-top: 24px;
+  border-top: 1px solid var(--color-border-light);
+  padding-top: 16px;
+}
+
+.memoToggle {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  width: 100%;
+  text-align: left;
+  transition: color 0.3s ease;
+}
+
+.memoToggle:hover {
+  color: var(--color-primary);
+}
+
+.toggleIcon {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.memoContent {
+  margin-top: 16px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.memoInput {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.memoTextarea {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+}
+
+.memoTextarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.addMemoButton {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.addMemoButton:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.addMemoButton:disabled {
+  background-color: var(--color-border);
+  cursor: not-allowed;
+}
+
+.memoList h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.memoItem {
+  background-color: var(--color-background-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.memoItem.usedMemo {
+  opacity: 0.6;
+  background-color: var(--color-background);
+}
+
+.memoText {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.memoMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.memoDate {
+  flex: 1;
+}
+
+.usedLabel {
+  background-color: var(--color-success);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.removeMemoButton {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  transition: color 0.3s ease;
+}
+
+.removeMemoButton:hover {
+  color: var(--color-error);
+}
+
+.clearUsedButton {
+  background-color: var(--color-secondary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.3s ease;
+}
+
+.clearUsedButton:hover {
+  background-color: var(--color-secondary-hover);
+}
+
+/* 메모 탭 스타일 */
+.memosTab {
+  padding: 24px;
+}
+
+.memoTabHeader {
+  margin-bottom: 32px;
+}
+
+.memoTabHeader h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  color: var(--color-text-primary);
+}
+
+.memoDescription {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.emptyMemos {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--color-text-secondary);
+}
+
+.emptyMemos p {
+  margin: 8px 0;
+}
+
+.memoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.memoCard {
+  background-color: var(--color-background-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+.memoCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.memoCard.usedMemoCard {
+  opacity: 0.7;
+  background-color: var(--color-background);
+}
+
+.memoContent {
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  color: var(--color-text-primary);
+}
+
+.memoFooter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.memoFooter .memoDate {
+  flex: 1;
+}
+
+.usedBadge {
+  background-color: var(--color-success);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.deleteMemoButton {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.deleteMemoButton:hover {
+  opacity: 1;
+}
+
+.clearUsedSection {
+  margin-top: 24px;
+  text-align: center;
+}
+
+/* 모드 전환 버튼 */
+.modeToggleButton {
+  padding: var(--spacing-sm);
+  background-color: var(--color-background-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modeToggleButton:hover {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+/* 음성 입력 컨테이너 */
+.voiceInputContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) 0;
+}
+
+/* 음성 버튼 - 그라데이션 및 스텝 효과 */
+.voiceButton {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: radial-gradient(circle at center, 
+    rgba(59, 130, 246, 0.9) 0%, 
+    rgba(59, 130, 246, 0.7) 30%, 
+    rgba(59, 130, 246, 0.5) 50%, 
+    rgba(59, 130, 246, 0.3) 70%, 
+    rgba(59, 130, 246, 0.1) 90%,
+    transparent 100%);
+  box-shadow: 
+    0 0 0 10px rgba(59, 130, 246, 0.1),
+    0 0 0 20px rgba(59, 130, 246, 0.08),
+    0 0 0 30px rgba(59, 130, 246, 0.05),
+    0 0 0 40px rgba(59, 130, 246, 0.03),
+    0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.voiceButton:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 
+    0 0 0 12px rgba(59, 130, 246, 0.15),
+    0 0 0 24px rgba(59, 130, 246, 0.1),
+    0 0 0 36px rgba(59, 130, 246, 0.06),
+    0 0 0 48px rgba(59, 130, 246, 0.04),
+    0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.voiceButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.voiceButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 녹음 중 애니메이션 */
+.voiceButton.recording {
+  animation: pulse 1.5s infinite;
+  background: radial-gradient(circle at center, 
+    rgba(239, 68, 68, 0.9) 0%, 
+    rgba(239, 68, 68, 0.7) 30%, 
+    rgba(239, 68, 68, 0.5) 50%, 
+    rgba(239, 68, 68, 0.3) 70%, 
+    rgba(239, 68, 68, 0.1) 90%,
+    transparent 100%);
+  box-shadow: 
+    0 0 0 10px rgba(239, 68, 68, 0.15),
+    0 0 0 20px rgba(239, 68, 68, 0.1),
+    0 0 0 30px rgba(239, 68, 68, 0.06),
+    0 0 0 40px rgba(239, 68, 68, 0.04),
+    0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 
+      0 0 0 10px rgba(239, 68, 68, 0.15),
+      0 0 0 20px rgba(239, 68, 68, 0.1),
+      0 0 0 30px rgba(239, 68, 68, 0.06),
+      0 0 0 40px rgba(239, 68, 68, 0.04),
+      0 4px 15px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 15px rgba(239, 68, 68, 0.2),
+      0 0 0 30px rgba(239, 68, 68, 0.15),
+      0 0 0 45px rgba(239, 68, 68, 0.1),
+      0 0 0 60px rgba(239, 68, 68, 0.05),
+      0 6px 25px rgba(239, 68, 68, 0.5);
+  }
+  100% {
+    box-shadow: 
+      0 0 0 10px rgba(239, 68, 68, 0.15),
+      0 0 0 20px rgba(239, 68, 68, 0.1),
+      0 0 0 30px rgba(239, 68, 68, 0.06),
+      0 0 0 40px rgba(239, 68, 68, 0.04),
+      0 4px 15px rgba(239, 68, 68, 0.4);
+  }
+}
+
+/* 음성 버튼 내부 아이콘 */
+.voiceButtonInner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.micIcon, .stopIcon, .transcribingIcon {
+  display: inline-block;
+}
+
+.transcribingIcon {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* 음성 힌트 텍스트 */
+.voiceHint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin: 0;
+}
