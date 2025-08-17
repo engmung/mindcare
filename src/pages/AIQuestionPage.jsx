@@ -233,13 +233,30 @@ const AIQuestionPage = () => {
   // 음성 녹음 시작
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      // 오디오 설정 최적화
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 44100
+        }
+      });
+      
+      // MediaRecorder 옵션 설정
+      const options = {
+        mimeType: 'audio/webm',
+        audioBitsPerSecond: 128000
+      };
+      
+      const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
+        if (event.data && event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
       };
 
       mediaRecorder.onstop = async () => {
@@ -248,7 +265,8 @@ const AIQuestionPage = () => {
         stream.getTracks().forEach(track => track.stop());
       };
 
-      mediaRecorder.start();
+      // timeslice를 100ms로 설정하여 더 자주 데이터를 수집
+      mediaRecorder.start(100);
       setIsRecording(true);
     } catch (error) {
       console.error('녹음 시작 실패:', error);
