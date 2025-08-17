@@ -9,7 +9,7 @@ class OutlineAgent {
         return {
           data: null,
           success: false,
-          error: '목차를 생성할 대화 데이터가 없습니다.'
+          error: '상담일지를 구성할 대화 데이터가 없습니다.'
         };
       }
 
@@ -54,13 +54,13 @@ class OutlineAgent {
 
       // 사용자 선택 형식을 한국어로 변환 (첫 번째 시안에만 사용)
       const formatMap = {
-        'chronological': '연대기형',
-        'essay': '에세이형',
-        'memoir': '회고록형',
-        'interview': '인터뷰형'
+        'thematic': '주제별 정리형',
+        'emotional': '감정 중심형',
+        'growth': '성장 여정형',
+        'integrative': '통합 분석형'
       };
 
-      const selectedFormatKorean = formatMap[selectedFormat] || '연대기형';
+      const selectedFormatKorean = formatMap[selectedFormat] || '주제별 정리형';
 
       // 통합 프롬프트 로드 및 템플릿 적용
       const prompt = await loadPromptWithTemplate('outline-generator.md', {
@@ -70,27 +70,27 @@ class OutlineAgent {
       });
 
       if (!prompt) {
-        throw new Error('목차 생성 프롬프트 파일을 불러올 수 없습니다.');
+        throw new Error('상담일지 구성 프롬프트 파일을 불러올 수 없습니다.');
       }
 
       // Structured Gemini API 호출
-      const systemInstruction = `당신은 자서전 목차 생성 전문가입니다. 
-      사용자의 대화 내용과 마인드맵 데이터를 바탕으로 3개의 서로 다른 목차 시안을 생성하세요.
+      const systemInstruction = `당신은 상담일지 구성 전문가입니다. 
+      사용자의 상담 대화 내용과 추출된 정보를 바탕으로 3개의 서로 다른 상담일지 구성안을 생성하세요.
       
       중요: 각 시안은 다음과 같이 차별화하세요.
       - 첫 번째 시안: 사용자가 선택한 ${selectedFormatKorean} 형식을 기반으로 구성
-      - 두 번째 시안: 사용자의 답변 내용을 분석해서 가장 적합하다고 판단되는 형식으로 구성 (사용자 선택과 달라도 됨)
-      - 세 번째 시안: 사용자 답변에서 발견한 다른 가능성이나 관점을 반영한 형식으로 구성
+      - 두 번째 시안: 상담 내용을 분석해서 가장 적합하다고 판단되는 형식으로 구성 (사용자 선택과 달라도 됨)
+      - 세 번째 시안: 통합적 관점에서 균형잡힌 구성
       
-      각 시안마다 내용에 맞는 최적의 형식을 선택하되, 고정된 접근법보다는 창의적이고 개성적인 구성을 고민하세요.`;
+      각 시안은 3-5개 장으로 구성하고, 공감적이고 희망적인 톤을 유지하세요.`;
       
-      // ========== 목차 생성 AI 프롬프트 전체 내용 (복사용) ==========
-      console.log('\n==================== 목차 생성 AI 프롬프트 시작 ====================');
+      // ========== 상담일지 구성 AI 프롬프트 전체 내용 (복사용) ==========
+      console.log('\n==================== 상담일지 구성 AI 프롬프트 시작 ====================');
       console.log('【System Instruction】');
       console.log(systemInstruction);
       console.log('\n【User Prompt】');
       console.log(prompt);
-      console.log('==================== 목차 생성 AI 프롬프트 끝 ====================\n');
+      console.log('==================== 상담일지 구성 AI 프롬프트 끝 ====================\n');
 
       const response = await geminiService.generateStructured(
         prompt,

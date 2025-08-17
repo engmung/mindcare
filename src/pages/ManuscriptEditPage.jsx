@@ -10,9 +10,9 @@ import styles from './ManuscriptEditPage.module.css';
 /**
  * ManuscriptEditPage
  * 
- * 용도: 원고 편집의 메인 페이지 - 좌우 분할 레이아웃
- * 사용처: 원고 생성 완료 후 편집 단계
- * 기능: 원고 뷰어, AI 상호작용 패널, 목차 네비게이터 통합
+ * 용도: 상담일지 편집의 메인 페이지 - 좌우 분할 레이아웃
+ * 사용처: 상담일지 생성 완료 후 편집 단계
+ * 기능: 상담일지 뷰어, AI 상호작용 패널, 구성 네비게이터 통합
  */
 
 function ManuscriptEditPage() {
@@ -49,7 +49,7 @@ function ManuscriptEditPage() {
   } = useManuscriptStore();
   
   // 로컬 상태
-  const [showOutlineNav, setShowOutlineNav] = useState(false); // 기본적으로 목차 숨김
+  const [showOutlineNav, setShowOutlineNav] = useState(false); // 기본적으로 구성 숨김
   const [isInitialized, setIsInitialized] = useState(false);
   const isInitializingRef = useRef(false);
   
@@ -78,20 +78,20 @@ function ManuscriptEditPage() {
           console.error('ManuscriptEditPage - 필수 데이터 누락');
           navigate('/mypage', { 
             replace: true,
-            state: { error: '원고 생성에 필요한 데이터가 없습니다.' }
+            state: { error: '상담일지 생성에 필요한 데이터가 없습니다.' }
           });
           return;
         }
         
         console.log('ManuscriptEditPage - 초기화 시작');
         console.log('- 대화 수:', conversations.length);
-        console.log('- 목차 형식:', outlineData.format_type);
+        console.log('- 구성 형식:', outlineData.format_type);
         
-        // 목차 정보 설정
-        console.log('ManuscriptEditPage - 목차 데이터 설정:', outlineData);
+        // 구성 정보 설정
+        console.log('ManuscriptEditPage - 구성 데이터 설정:', outlineData);
         setOutline(outlineData);
         
-        // 프로젝트에서 기존 원고 및 이미지 확인 - localStorage에서 직접 최신 데이터 가져오기
+        // 프로젝트에서 기존 상담일지 및 이미지 확인 - localStorage에서 직접 최신 데이터 가져오기
         let existingManuscript = '';
         let existingImages = [];
         
@@ -101,7 +101,7 @@ function ManuscriptEditPage() {
           existingManuscript = currentProject?.data?.manuscript || '';
           existingImages = currentProject?.data?.manuscriptImages || [];
           
-          console.log('ManuscriptEditPage - localStorage에서 원고 및 이미지 확인:', {
+          console.log('ManuscriptEditPage - localStorage에서 상담일지 및 이미지 확인:', {
             projectId: currentProjectId,
             manuscriptLength: existingManuscript.length,
             hasManuscript: !!existingManuscript.trim(),
@@ -122,27 +122,27 @@ function ManuscriptEditPage() {
         }
         
         if (existingManuscript && existingManuscript.trim().length > 0) {
-          console.log('ManuscriptEditPage - 기존 원고 로드:', existingManuscript.length, '자');
+          console.log('ManuscriptEditPage - 기존 상담일지 로드:', existingManuscript.length, '자');
           setManuscript(existingManuscript, false); // 히스토리에 추가하지 않음
         } else if (!currentManuscript || currentManuscript.trim().length === 0) {
-          console.log('ManuscriptEditPage - 새 원고 생성 중...');
+          console.log('ManuscriptEditPage - 새 상담일지 생성 중...');
           const result = await generateManuscript({
             conversations,
             outlineData
           });
           
           if (!result.success) {
-            console.error('원고 생성 실패:', result.error);
+            console.error('상담일지 생성 실패:', result.error);
             navigate('/mypage', {
               replace: true,
-              state: { error: `원고 생성 실패: ${result.error}` }
+              state: { error: `상담일지 생성 실패: ${result.error}` }
             });
             return;
           }
           
-          // 생성된 원고를 프로젝트에 저장
+          // 생성된 상담일지를 프로젝트에 저장
           if (updateProjectData && result.manuscript) {
-            console.log('ManuscriptEditPage - 원고를 프로젝트에 저장:', {
+            console.log('ManuscriptEditPage - 상담일지를 프로젝트에 저장:', {
               manuscriptLength: result.manuscript.length,
               projectId: currentProjectId
             });
@@ -232,7 +232,7 @@ function ManuscriptEditPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [canUndo, canRedo, undo, redo, selectedText]);
   
-  // 원고 자동 저장 (디바운싱)
+  // 상담일지 자동 저장 (디바운싱)
   useEffect(() => {
     if (!currentManuscript || !isInitialized) return;
     
@@ -243,7 +243,7 @@ function ManuscriptEditPage() {
     return () => clearTimeout(saveTimer);
   }, [currentManuscript, isInitialized, saveManuscriptToProject]);
   
-  // 목차 상태 디버깅
+  // 구성 상태 디버깅
   useEffect(() => {
     console.log('ManuscriptEditPage - outline 상태 변경:', outline);
   }, [outline]);
@@ -263,21 +263,21 @@ function ManuscriptEditPage() {
     }
   };
   
-  // 목차 선택 페이지로 돌아가기 또는 문체 모드 종료
+  // 구성 선택 페이지로 돌아가기 또는 문체 모드 종료
   const handleBackToOutline = async () => {
     // 문체 모드인 경우 문체 모드만 종료
     if (isStyleMode) {
       setStyleMode(false);
-      console.log('ManuscriptEditPage - 문체 모드 종료, 원고 편집 모드로 복귀');
+      console.log('ManuscriptEditPage - 문체 모드 종료, 상담일지 편집 모드로 복귀');
       return;
     }
     
-    // 원고 편집 모드인 경우 목차 선택으로 돌아가기
+    // 상담일지 편집 모드인 경우 구성 선택으로 돌아가기
     const { conversations, outlineData, projectId } = location.state || {};
     if (conversations && projectId) {
-      if (confirm('원고 데이터가 삭제됩니다. 목차 단계로 돌아가시겠습니까?')) {
-        console.log('ManuscriptEditPage - 목차 선택 페이지로 돌아가기, 원고 데이터 삭제');
-        // 7단계(목차 완료)로 돌아가면서 원고 데이터 삭제
+      if (confirm('상담일지 데이터가 삭제됩니다. 구성 단계로 돌아가시겠습니까?')) {
+        console.log('ManuscriptEditPage - 구성 선택 페이지로 돌아가기, 상담일지 데이터 삭제');
+        // 7단계(구성 완료)로 돌아가면서 상담일지 데이터 삭제
         await resetToStep(7);
         
         // 추가 안전 지연
@@ -291,7 +291,7 @@ function ManuscriptEditPage() {
         });
       }
     } else {
-      console.warn('ManuscriptEditPage - 목차 페이지로 돌아가기 위한 데이터 부족');
+      console.warn('ManuscriptEditPage - 구성 페이지로 돌아가기 위한 데이터 부족');
       handleBackToMain();
     }
   };
@@ -302,7 +302,7 @@ function ManuscriptEditPage() {
       <div className={styles.loadingContainer}>
         <div className={styles.loadingSpinner}>
           <div className={styles.spinner}></div>
-          <p>원고를 {isGenerating ? '생성' : '준비'}하고 있습니다...</p>
+          <p>상담일지를 {isGenerating ? '생성' : '준비'}하고 있습니다...</p>
           {generationError && (
             <div className={styles.errorMessage}>
               오류: {generationError}
@@ -321,9 +321,9 @@ function ManuscriptEditPage() {
           <button 
             className={styles.backButton}
             onClick={handleBackToOutline}
-            title={isStyleMode ? "원고 편집 모드로 돌아가기" : "목차 선택으로 돌아가기"}
+            title={isStyleMode ? "상담일지 편집 모드로 돌아가기" : "구성 선택으로 돌아가기"}
           >
-            {isStyleMode ? '← 원고 편집' : '← 목차 편집'}
+            {isStyleMode ? '← 상담일지 편집' : '← 구성 편집'}
           </button>
           
           <button 
@@ -335,7 +335,7 @@ function ManuscriptEditPage() {
           </button>
           
           <div className={styles.pageTitle}>
-            <h1>{isStyleMode ? '문체 변경' : '원고 편집'}</h1>
+            <h1>{isStyleMode ? '문체 변경' : '상담일지 편집'}</h1>
             <span className={styles.subtitle}>
               {isStyleMode ? 
                 '원하는 문체를 선택하고 미리보기를 확인하세요' : 
@@ -375,11 +375,11 @@ function ManuscriptEditPage() {
           {/* 문체 모드가 아닐 때만 표시 */}
           {!isStyleMode && (
             <>
-              {/* 개발용 원고 재생성 버튼 */}
+              {/* 개발용 상담일지 재생성 버튼 */}
               <button
                 className={styles.devButton}
                 onClick={async () => {
-                  if (confirm('원고를 재생성하시겠습니까? 현재 원고는 삭제됩니다.')) {
+                  if (confirm('상담일지를 재생성하시겠습니까? 현재 상담일지는 삭제됩니다.')) {
                     const { conversations, outlineData } = location.state || {};
                     if (conversations && outlineData) {
                       await generateManuscript({ conversations, outlineData });
@@ -387,9 +387,9 @@ function ManuscriptEditPage() {
                   }
                 }}
                 disabled={isGenerating}
-                title="원고 재생성 (개발용)"
+                title="상담일지 재생성 (개발용)"
               >
-                🔄 원고 재생성
+                🔄 상담일지 재생성
               </button>
               
               {/* 완료 버튼 */}
@@ -405,25 +405,25 @@ function ManuscriptEditPage() {
         </div>
       </header>
       
-      {/* 목차 토글 버튼 (화면 좌측 가장자리) */}
+      {/* 구성 토글 버튼 (화면 좌측 가장자리) */}
       <button
         className={`${styles.outlineToggleButton} ${showOutlineNav ? styles.active : ''}`}
         onClick={() => setShowOutlineNav(!showOutlineNav)}
-        title={`목차 ${showOutlineNav ? '숨기기' : '보기'}`}
+        title={`구성 ${showOutlineNav ? '숨기기' : '보기'}`}
       >
         📑
       </button>
 
       {/* 메인 컨텐츠 영역 */}
       <main className={styles.mainContent}>
-        {/* 좌측: 원고 뷰어 + 목차 네비게이터 */}
+        {/* 좌측: 상담일지 뷰어 + 구성 네비게이터 */}
         <div className={styles.leftPanel}>
-          {/* 목차 네비게이터 (접을 수 있음) */}
+          {/* 구성 네비게이터 (접을 수 있음) */}
           <div className={`${styles.outlineNavSection} ${showOutlineNav ? styles.show : ''}`}>
             <OutlineNavigator />
           </div>
           
-          {/* 원고 뷰어 */}
+          {/* 상담일지 뷰어 */}
           <div className={styles.manuscriptSection}>
             <ManuscriptViewer />
           </div>

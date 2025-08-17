@@ -129,7 +129,7 @@ export const schemas = {
     properties: {
       format_type: {
         type: Type.STRING,
-        enum: ["연대기순", "주제별", "에세이형", "회고록형", "인터뷰형"]
+        enum: ["주제별 정리형", "감정 중심형", "성장 여정형", "통합 분석형"]
       },
       overall_theme: { type: Type.STRING },
       chapters: {
@@ -166,7 +166,7 @@ export const schemas = {
             concept: { type: Type.STRING },
             format_type: {
               type: Type.STRING,
-              enum: ["연대기순", "주제별", "에세이형", "회고록형", "인터뷰형"]
+              enum: ["주제별 정리형", "감정 중심형", "성장 여정형", "통합 분석형"]
             },
             overall_theme: { type: Type.STRING },
             chapters: {
@@ -200,11 +200,11 @@ export const schemas = {
     properties: {
       title: {
         type: Type.STRING,
-        description: "자서전 제목"
+        description: "상담일지 제목"
       },
       chapters: {
         type: Type.ARRAY,
-        description: "장별로 구조화된 원고 내용",
+        description: "장별로 구조화된 상담일지 내용",
         items: {
           type: Type.OBJECT,
           properties: {
@@ -218,7 +218,7 @@ export const schemas = {
             },
             content: {
               type: Type.STRING,
-              description: "해당 장의 순수한 내용 - 1인칭 시점, 최소 10,000자"
+              description: "해당 장의 순수한 내용 - 1인칭 시점, 4,000-5,000자"
             }
           },
           required: ["chapter_number", "chapter_title", "content"]

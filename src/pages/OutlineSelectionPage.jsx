@@ -1,7 +1,7 @@
 /**
  * OutlineSelectionPage
  * 
- * 용도: 목차 시안 선택 및 수정 페이지
+ * 용도: 상담일지 구성 선택 및 수정 페이지
  * 사용처: /project/:projectId/outline 경로
  * props: projectId (URL 파라미터)
  */
@@ -25,9 +25,9 @@ const OutlineSelectionPage = () => {
   const conversations = stateConversations || useWriteStore.getState().conversations;
   
   // 상태 관리
-  const [outlines, setOutlines] = useState([]); // 현재 표시 중인 목차들
+  const [outlines, setOutlines] = useState([]); // 현재 표시 중인 상담일지 구성들
   const [currentOutlineIndex, setCurrentOutlineIndex] = useState(0); // 캐러셀 현재 인덱스
-  const [selectedOutline, setSelectedOutline] = useState(null); // 선택된 목차
+  const [selectedOutline, setSelectedOutline] = useState(null); // 선택된 구성
   const [isEditMode, setIsEditMode] = useState(false); // 수정 모드 여부
   const [modificationRequest, setModificationRequest] = useState(''); // 수정 요청 내용
   const [isLoading, setIsLoading] = useState(false);
@@ -126,7 +126,7 @@ const OutlineSelectionPage = () => {
       console.error('OutlineSelectionPage - 필수 데이터 누락');
       navigate('/mypage', {
         replace: true,
-        state: { error: '목차 생성에 필요한 데이터가 없습니다.' }
+        state: { error: '상담일지 구성에 필요한 데이터가 없습니다.' }
       });
       return;
     }
@@ -135,13 +135,13 @@ const OutlineSelectionPage = () => {
   // 첫 진입 시 3개 시안 생성
   useEffect(() => {
     if (conversations.length > 0 && outlines.length === 0 && !isLoading && !isInitializedRef.current) {
-      console.log('OutlineSelectionPage - 목차 생성 조건 충족, 생성 시작');
+      console.log('OutlineSelectionPage - 상담일지 구성 조건 충족, 생성 시작');
       isInitializedRef.current = true;
       generateInitialOutlines();
     }
   }, [conversations.length]); // conversations 길이 변경 시 확인
 
-  // 3개의 목차 시안 생성 (첫 생성 또는 새로고침)
+  // 3개의 상담일지 구성안 생성 (첫 생성 또는 새로고침)
   const generateInitialOutlines = async () => {
     if (isLoading) {
       console.log('OutlineSelectionPage - 이미 로딩 중, 중복 생성 방지');
@@ -152,7 +152,7 @@ const OutlineSelectionPage = () => {
     setError(null);
     
     try {
-      console.log('OutlineSelectionPage - 목차 생성 API 호출');
+      console.log('OutlineSelectionPage - 상담일지 구성 API 호출');
       const result = await outlineAgent.generateOutlineOptions(
         conversations,
         null, // 마인드맵 데이터는 추후 연동
@@ -161,31 +161,31 @@ const OutlineSelectionPage = () => {
       
       if (result.success && result.data.options) {
         setOutlines(result.data.options);
-        setCurrentOutlineIndex(0); // 첫 번째 목차로 리셋
+        setCurrentOutlineIndex(0); // 첫 번째 구성으로 리셋
         setIsEditMode(false);
         setSelectedOutline(null);
         setModificationRequest('');
       } else {
-        throw new Error(result.error || '목차 생성에 실패했습니다.');
+        throw new Error(result.error || '상담일지 구성에 실패했습니다.');
       }
     } catch (error) {
-      console.error('목차 생성 오류:', error);
-      setError('목차 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+      console.error('상담일지 구성 오류:', error);
+      setError('상담일지 구성 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 목차 선택
+  // 상담일지 구성 선택
   const handleSelectOutline = (outline) => {
     setSelectedOutline(outline);
-    setOutlines([outline]); // 선택된 목차만 표시
+    setOutlines([outline]); // 선택된 구성만 표시
     setCurrentOutlineIndex(0); // 인덱스 리셋
     setIsEditMode(true);
     setEditHistory([outline]); // 수정 이력 시작
   };
 
-  // 목차 수정 요청
+  // 상담일지 구성 수정 요청
   const handleModifyOutline = async () => {
     if (!modificationRequest.trim() || !selectedOutline) return;
     
@@ -204,7 +204,7 @@ const OutlineSelectionPage = () => {
         const modifiedOutline = {
           ...result.data,
           option_number: 1,
-          concept: "수정된 목차"
+          concept: "수정된 구성"
         };
         
         setOutlines([modifiedOutline]);
@@ -213,40 +213,40 @@ const OutlineSelectionPage = () => {
         setEditHistory([...editHistory, modifiedOutline]);
         setModificationRequest('');
       } else {
-        throw new Error(result.error || '목차 수정에 실패했습니다.');
+        throw new Error(result.error || '상담일지 구성 수정에 실패했습니다.');
       }
     } catch (error) {
-      console.error('목차 수정 오류:', error);
-      setError('목차 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
+      console.error('상담일지 구성 수정 오류:', error);
+      setError('상담일지 구성 수정 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 목차 확정 및 저장
+  // 상담일지 구성 확정 및 저장
   const handleConfirmOutline = async () => {
     if (!selectedOutline) return;
     
-    // 목차 데이터 준비
+    // 상담일지 구성 데이터 준비
     const outlineData = {
       format_type: selectedOutline.format_type,
       overall_theme: selectedOutline.overall_theme,
       chapters: selectedOutline.chapters
     };
     
-    // 프로젝트 데이터에 목차 저장
+    // 프로젝트 데이터에 구성 저장
     if (updateProjectData) {
-      console.log('OutlineSelectionPage - 목차 저장:', outlineData);
+      console.log('OutlineSelectionPage - 상담일지 구성 저장:', outlineData);
       updateProjectData({ 
         outline: outlineData
       });
-      // currentStep을 7로 업데이트 (목차 완료)
+      // currentStep을 7로 업데이트 (구성 완료)
       if (updateProjectStep && projectId) {
         updateProjectStep(projectId, 7);
       }
     }
     
-    console.log('OutlineSelectionPage - 목차 확정, 원고 편집 페이지로 이동');
+    console.log('OutlineSelectionPage - 상담일지 구성 확정, 상담 기록 편집 페이지로 이동');
     
     // 원고 편집 페이지로 바로 이동
     navigate('/manuscript-edit', {
@@ -272,7 +272,7 @@ const OutlineSelectionPage = () => {
     }
   };
 
-  // 목차 렌더링
+  // 상담일지 구성 렌더링
   const renderOutlineCard = (outline, index) => (
     <div key={index} className={styles.outlineCard}>
       <div className={styles.outlineHeader}>
@@ -285,7 +285,7 @@ const OutlineSelectionPage = () => {
       </div>
       
       <div className={styles.chapterList}>
-        <h4>목차 구성</h4>
+        <h4>상담일지 구성</h4>
         {outline.chapters.map((chapter) => (
           <div key={chapter.chapter_number} className={styles.chapterItem}>
             <div className={styles.chapterNumber}>제{chapter.chapter_number}장</div>
@@ -316,7 +316,7 @@ const OutlineSelectionPage = () => {
           onClick={() => handleSelectOutline(outline)}
           className={styles.selectButton}
         >
-          이 목차 선택하기
+          이 구성 선택하기
         </button>
       )}
     </div>
@@ -330,8 +330,8 @@ const OutlineSelectionPage = () => {
     <div className={styles.outlineSelectionPage}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h1>목차 구성하기</h1>
-          <p>AI가 제안하는 목차 중 하나를 선택하고, 원하는대로 수정해보세요.</p>
+          <h1>상담일지 구성하기</h1>
+          <p>AI가 제안하는 구성 중 하나를 선택하고, 원하는대로 수정해보세요.</p>
         </div>
 
         {error && (
@@ -343,17 +343,17 @@ const OutlineSelectionPage = () => {
         {isLoading ? (
           <div className={styles.loadingContainer}>
             <div className={styles.spinner}></div>
-            <p>{isEditMode ? '목차를 수정하고 있습니다...' : '목차를 생성하고 있습니다...'}</p>
+            <p>{isEditMode ? '구성을 수정하고 있습니다...' : '상담일지 구성을 생성하고 있습니다...'}</p>
           </div>
         ) : (
           <>
             <div className={styles.actionBar}>
               <button
                 onClick={async () => {
-                  if (confirm('목차 데이터가 삭제됩니다. 질문 단계로 돌아가시겠습니까?')) {
-                    console.log('OutlineSelectionPage - AI 질문 페이지로 돌아가기, 목차 데이터 삭제');
+                  if (confirm('구성 데이터가 삭제됩니다. 상담 단계로 돌아가시겠습니까?')) {
+                    console.log('OutlineSelectionPage - 상담 페이지로 돌아가기, 구성 데이터 삭제');
                     
-                    // 6단계(질문 완료)로 돌아가면서 목차, 원고 데이터 삭제
+                    // 6단계(상담 완료)로 돌아가면서 구성, 상담 기록 데이터 삭제
                     await resetToStep(6);
                     
                     // 추가 안전 지연
@@ -392,7 +392,7 @@ const OutlineSelectionPage = () => {
                   onClick={handleConfirmOutline}
                   className={styles.confirmButton}
                 >
-                  ✅ 목차 확정하기
+                  ✅ 구성 확정하기
                 </button>
               )}
             </div>
@@ -434,7 +434,7 @@ const OutlineSelectionPage = () => {
                 </div>
               )}
               
-              {/* 현재 목차 카드 */}
+              {/* 현재 구성 카드 */}
               <div 
                 className={styles.currentOutlineContainer}
                 onTouchStart={handleTouchStart}
@@ -447,15 +447,15 @@ const OutlineSelectionPage = () => {
               {/* 키보드/터치 안내 */}
               {outlines.length > 1 && !isEditMode && (
                 <div className={styles.navigationHint}>
-                  <span className={styles.desktopHint}>← → 키로 목차를 탐색할 수 있습니다</span>
-                  <span className={styles.mobileHint}>좌우로 스와이프하여 목차를 탐색할 수 있습니다</span>
+                  <span className={styles.desktopHint}>← → 키로 구성을 탐색할 수 있습니다</span>
+                  <span className={styles.mobileHint}>좌우로 스와이프하여 구성을 탐색할 수 있습니다</span>
                 </div>
               )}
             </div>
 
             {isEditMode && (
               <div className={styles.modificationSection}>
-                <h3>목차 수정하기</h3>
+                <h3>구성 수정하기</h3>
                 <p>원하는 수정 사항을 자유롭게 입력해주세요.</p>
                 <textarea
                   value={modificationRequest}
