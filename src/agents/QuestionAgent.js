@@ -40,9 +40,9 @@ class QuestionAgent {
       // 후속 질문용 프롬프트 템플릿 변수
       const templateVars = {
         USER_INFO: userInfoText,
-        PROJECT_TITLE: projectInfo?.title || '자서전 프로젝트',
-        PROJECT_TOPIC: projectInfo?.topic || '인생 이야기',
-        PROJECT_FORMAT: projectInfo?.format || '연대기순',
+        PROJECT_TITLE: projectInfo?.title || '상담 세션',
+        PROJECT_TOPIC: projectInfo?.topic || '일상과 고민',
+        PROJECT_FORMAT: projectInfo?.format || '주제별 정리형',
         AGE: userInfo?.birthDate ? calculateAge(userInfo.birthDate) : '나이',
         JOB: userInfo?.careerHistory || '직업',
         HOBBY: userInfo?.hobbies || '취미'
@@ -155,9 +155,9 @@ class QuestionAgent {
       // 프롬프트 로드 및 템플릿 적용 (통합 프롬프트 사용)
       const templateVars = {
         USER_INFO: userInfoText,
-        PROJECT_TITLE: projectInfo?.title || '자서전 프로젝트',
-        PROJECT_TOPIC: projectInfo?.topic || '인생 이야기',
-        PROJECT_FORMAT: projectInfo?.format || '연대기순',
+        PROJECT_TITLE: projectInfo?.title || '상담 세션',
+        PROJECT_TOPIC: projectInfo?.topic || '일상과 고민',
+        PROJECT_FORMAT: projectInfo?.format || '주제별 정리형',
         AGE: userInfo?.birthDate ? calculateAge(userInfo.birthDate) : '나이',
         JOB: userInfo?.careerHistory || '직업',
         HOBBY: userInfo?.hobbies || '취미'
@@ -176,9 +176,17 @@ class QuestionAgent {
       console.log(prompt);
 
       // Structured Gemini API 호출
-      const systemInstruction = `당신은 자서전 작성을 위한 질문 생성 전문가입니다. 
-      사용자의 인생 이야기를 깊이 있게 끌어낼 수 있는 개인적이고 의미 있는 질문을 생성하세요.
-      사용자가 자신의 경험에서 긍정적 의미와 성장을 발견할 수 있도록 공감적이고 따뜻한 질문을 만들어주세요.`;
+      const systemInstruction = `당신은 심리상담 대화 전문가입니다.
+      
+      중요 원칙:
+      1. 대화 초반(1-5번): 구체적이고 일상적인 질문만 하세요. 추상적 질문 금지.
+      2. 대화 중반(6-10번): 구체적 상황과 간단한 감정을 탐색하세요.
+      3. 대화 후반(11번 이후): 비로소 깊은 감정과 의미를 탐색할 수 있습니다.
+      
+      현재 대화 횟수: ${conversations.length + 1}번째
+      
+      반드시 "무엇", "언제", "어디서", "누구와", "어떻게" 같은 구체적 질문을 우선하고,
+      "왜", "의미", "감정" 같은 추상적 질문은 충분한 라포 형성 후에만 사용하세요.`;
       
       const response = await geminiService.generateStructured(
         prompt,
