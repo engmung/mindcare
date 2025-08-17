@@ -31,7 +31,8 @@ export async function transcribeAudio(audioBlob, filename = 'audio.webm') {
     // 간단하게 Whisper API 호출
     const transcription = await openai.audio.transcriptions.create({
       file: audioFile,
-      model: 'whisper-1'
+      model: 'whisper-1',
+      language: 'ko' // 한국어 명시
     });
 
     console.log('변환 결과:', transcription);
@@ -40,7 +41,11 @@ export async function transcribeAudio(audioBlob, filename = 'audio.webm') {
     const text = typeof transcription === 'string' ? transcription : transcription.text;
     console.log('추출된 텍스트:', text);
     
-    return text;
+    // 일관된 객체 형태로 반환
+    return {
+      success: true,
+      text: text
+    };
   } catch (error) {
     console.error('음성 변환 오류:', error);
     
@@ -54,6 +59,13 @@ export async function transcribeAudio(audioBlob, filename = 'audio.webm') {
     } else {
       throw new Error('음성을 텍스트로 변환하는 중 오류가 발생했습니다.');
     }
+    
+    // 에러 발생 시에도 일관된 형태로 반환
+    return {
+      success: false,
+      text: '',
+      error: error.message
+    };
   }
 }
 

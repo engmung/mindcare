@@ -704,22 +704,20 @@
   border-color: var(--color-primary);
 }
 
-/* 음성 입력 컨테이너 */
-.voiceInputContainer {
-  flex: 1;
+/* 음성 입력 래퍼 */
+.voiceInputWrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg) 0;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) 0;
 }
 
 /* 음성 버튼 - 그라데이션 및 스텝 효과 */
 .voiceButton {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -810,7 +808,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36px;
+  font-size: 24px;
   color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -834,4 +832,59 @@
   color: var(--color-text-secondary);
   text-align: center;
   margin: 0;
+}
+
+/* 음성 모드 컨테이너 - 수직 레이아웃 */
+.voiceModeContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+/* 텍스트 영역 (상단) */
+.voiceTextArea {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: flex-end;
+  width: 100%;
+}
+
+/* 음성 버튼 영역 (하단) */
+.voiceButtonArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) 0;
+}
+
+/* 모바일에서 음성 모드 최적화 */
+@media (max-width: 768px) {
+  .voiceModeContainer {
+    gap: var(--spacing-sm);
+  }
+  
+  .voiceTextArea {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .voiceTextArea .messageInput {
+    width: 100%;
+  }
+  
+  .voiceTextArea .sendButton {
+    width: 100%;
+  }
+  
+  .voiceButton {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .voiceButtonInner {
+    font-size: 20px;
+  }
 }

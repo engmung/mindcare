@@ -244,7 +244,7 @@ const AIQuestionPage = () => {
 
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        await transcribeAndSend(audioBlob);
+        await transcribeAudioToText(audioBlob);
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -272,17 +272,22 @@ const AIQuestionPage = () => {
     }
   };
 
-  // 음성을 텍스트로 변환하고 전송
-  const transcribeAndSend = async (audioBlob) => {
+  // 음성을 텍스트로 변환 (전송하지 않고 입력 필드에만 표시)
+  const transcribeAudioToText = async (audioBlob) => {
     setIsTranscribing(true);
     try {
       const result = await transcribeAudio(audioBlob);
       if (result.success && result.text) {
         setInputValue(result.text);
-        // 자동으로 메시지 전송
+        // 입력 필드에 포커스
         setTimeout(() => {
-          handleSendMessage(result.text);
-        }, 500);
+          const inputField = document.querySelector('textarea.messageInput');
+          if (inputField) {
+            inputField.focus();
+            // 커서를 텍스트 끝으로 이동
+            inputField.setSelectionRange(result.text.length, result.text.length);
+          }
+        }, 100);
       } else {
         alert('음성 인식에 실패했습니다. 다시 시도해주세요.');
       }
@@ -425,28 +430,49 @@ const AIQuestionPage = () => {
             </button>
           </>
         ) : (
-          /* 음성 입력 모드 */
-          <div className={styles.voiceInputContainer}>
-            <button
-              onClick={handleVoiceClick}
-              className={`${styles.voiceButton} ${isRecording ? styles.recording : ''}`}
-              disabled={isTranscribing || isTyping}
-            >
-              <div className={styles.voiceButtonInner}>
-                {isTranscribing ? (
-                  <span className={styles.transcribingIcon}>...</span>
-                ) : isRecording ? (
-                  <span className={styles.stopIcon}>⏹️</span>
-                ) : (
-                  <span className={styles.micIcon}>🎤</span>
-                )}
-              </div>
-            </button>
-            <p className={styles.voiceHint}>
-              {isRecording ? '녹음 중... 클릭하여 종료' : 
-               isTranscribing ? '텍스트 변환 중...' : 
-               '클릭하여 녹음 시작'}
-            </p>
+          /* 음성 입력 모드 - 모바일 최적화 레이아웃 */
+          <div className={styles.voiceModeContainer}>
+            <div className={styles.voiceTextArea}>
+              <textarea
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="음성 인식 결과가 여기에 표시됩니다..."
+                className={`${styles.messageInput} messageInput`}
+                disabled={isTyping || isTranscribing}
+                rows={2}
+              />
+              <button 
+                onClick={() => handleSendMessage()}
+                className={styles.sendButton}
+                disabled={isTyping || !inputValue.trim() || isTranscribing}
+              >
+                전송
+              </button>
+            </div>
+            <div className={styles.voiceButtonArea}>
+              <button
+                onClick={handleVoiceClick}
+                className={`${styles.voiceButton} ${isRecording ? styles.recording : ''}`}
+                disabled={isTranscribing || isTyping}
+              >
+                <div className={styles.voiceButtonInner}>
+                  {isTranscribing ? (
+                    <span className={styles.transcribingIcon}>...</span>
+                  ) : isRecording ? (
+                    <span className={styles.stopIcon}>⏹️</span>
+                  ) : (
+                    <span className={styles.micIcon}>🎤</span>
+                  )}
+                </div>
+              </button>
+              <p className={styles.voiceHint}>
+                {isRecording ? '녹음 중... 클릭하여 종료' : 
+                 isTranscribing ? '텍스트 변환 중...' : 
+                 inputValue ? '텍스트를 확인하고 수정 후 전송하세요' :
+                 '클릭하여 녹음 시작'}
+              </p>
+            </div>
           </div>
         )}
       </div>
